@@ -1,6 +1,8 @@
 #pragma once
 #include "SFML/Graphics.h"
 #include "SFML/System.h"
+#include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 typedef struct Player {
@@ -9,6 +11,7 @@ typedef struct Player {
   sfSprite ***sprites;
   int frames[3];
   int animationLoaded;
+  float mass;
 } Player;
 
 int hash(char *string) {
@@ -53,7 +56,7 @@ void loadSprite(Player **player, char *path, int frames,char * key) {
      (*player)->sprites[index][x - 1]  = sfSprite_create();
     sfSprite_setTexture ((*player)->sprites[index][x - 1], text, 1);
     sfSprite_setPosition((*player)->sprites[index][x - 1], (sfVector2f){125.f, 125.f});
-    sfSprite_setScale   ((*player)->sprites[index][x - 1], (sfVector2f){.x = 0.5, .y = 0.5});
+    sfSprite_setScale   ((*player)->sprites[index][x - 1], (sfVector2f){.x = 0.125, .y = 0.125});
     // sfTexture_destroy(text);
     free(tempPath);
   }

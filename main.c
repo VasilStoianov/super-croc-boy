@@ -4,6 +4,7 @@
 #include "player.h"
 #include <stdio.h>
 #include <stdlib.h>
+#include "game.h"
 
 void spriteDestroy(Player *player);
 
@@ -29,6 +30,8 @@ int main() {
   sfEvent event;
 
   Player *player = malloc(sizeof(Player));
+  player->velocity = (sfVector2f){.x = 0,.y=0};
+  player->mass = 65;
   player->animationLoaded = 1;
   loadSprites(player);
 
@@ -63,7 +66,11 @@ int main() {
         sfRenderWindow_close(renderer);
       }
     }
+    applyGravity(&player);
     sfRenderWindow_drawRectangleShape(renderer, rect, &state);
+    // sfSprite_move(player->sprites[index][frame],player->velocity);
+    sfSprite_setPosition(player->sprites[index][frame],player->position);
+    
     sfRenderWindow_drawSprite(renderer, player->sprites[index][frame], &state);
 
     if (timeAsSeconds > 155) {
