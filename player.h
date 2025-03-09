@@ -23,7 +23,7 @@ int hash(char *string) {
   return num + len;
 }
 
-void loadSprite(Player **player, char *path, int frames) {
+void loadSprite(Player **player, char *path, int frames,char * key) {
     int animations = 3;
     if((*player)->animationLoaded){
     (*player)->sprites = (sfSprite***) malloc(animations * sizeof(sfSprite ***));
@@ -34,7 +34,7 @@ void loadSprite(Player **player, char *path, int frames) {
     }
   
 
-  int index = hash(path) % animations;
+  int index = hash(key) % animations;
   (*player)->frames[index] = frames;
   (*player)->sprites[index] = malloc(frames * sizeof(sfSprite**));
   
@@ -57,4 +57,15 @@ void loadSprite(Player **player, char *path, int frames) {
     // sfTexture_destroy(text);
     free(tempPath);
   }
+}
+
+void loadSprites(Player * player){
+
+  char * idle = "./textures/idle/frame-";
+  char * dizzy = "./textures/dizzy/frame-";
+  char * path = "./textures/run/frame-";
+  loadSprite(&player,idle,2,"idle");
+  loadSprite(&player,dizzy,2,"dizzy");
+  loadSprite(&player,path,4,"run");
+
 }
