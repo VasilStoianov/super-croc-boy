@@ -47,7 +47,7 @@ void loadSprite(Player **player, char *path, int frames,char * key) {
     tempPath = (char *)malloc(length);
     strcpy(tempPath, path);
     snprintf(tempPath + strlen(path), length - strlen(tempPath), "%d.png", x);
-    printf("%s\n", tempPath);
+    printf("INFO: Loaded sprite:  %s\n", tempPath);
 
     sfTexture *text = sfTexture_createFromFile(
         tempPath,
@@ -70,5 +70,15 @@ void loadSprites(Player * player){
   loadSprite(&player,idle,2,"idle");
   loadSprite(&player,dizzy,2,"dizzy");
   loadSprite(&player,path,4,"run");
+
+}
+
+Player* createPlayer(){
+
+  Player *player = malloc(sizeof(Player));
+  player->velocity = (sfVector2f){.x = 0,.y=0};
+  player->mass = 65;
+  player->animationLoaded = 1;
+ return player;
 
 }

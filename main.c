@@ -28,11 +28,8 @@ int main() {
   sfRenderStates state = sfRenderStates_default();
  
   sfEvent event;
+ Player * player = createPlayer();
 
-  Player *player = malloc(sizeof(Player));
-  player->velocity = (sfVector2f){.x = 0,.y=0};
-  player->mass = 65;
-  player->animationLoaded = 1;
   loadSprites(player);
 
   int index = hash("idle") % 3;
@@ -58,6 +55,7 @@ int main() {
     timeAsSeconds = sfTime_asMilliseconds(elapsedTime);
 
     sfRenderWindow_clear(renderer, sfBlack);
+    
     while (sfRenderWindow_pollEvent(renderer, &event)) {
       if (event.key.type == sfEvtClosed) {
         sfRenderWindow_close(renderer);
@@ -68,7 +66,6 @@ int main() {
     }
     applyGravity(&player);
     sfRenderWindow_drawRectangleShape(renderer, rect, &state);
-    // sfSprite_move(player->sprites[index][frame],player->velocity);
     sfSprite_setPosition(player->sprites[index][frame],player->position);
     
     sfRenderWindow_drawSprite(renderer, player->sprites[index][frame], &state);
