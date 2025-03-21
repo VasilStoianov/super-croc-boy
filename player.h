@@ -73,10 +73,13 @@ void loadSprite(Player **player, char *path, int frames,char * key) {
             .top = 0.f, .left = 25.f, .width = (*player)->size.x, .height =(*player)->size.y});
      (*player)->sprites[index][x - 1]  = sfSprite_create();
     sfSprite_setTexture ((*player)->sprites[index][x - 1], text, 1);
-    sfSprite_setPosition((*player)->sprites[index][x - 1], (sfVector2f){125.f, 125.f});
-    (*player)->scale = (sfVector2f){.x = 0.125, .y = 0.125};
     
+    (*player)->scale = (sfVector2f){.x = 0.125, .y = 0.125};
+     sfFloatRect or = sfSprite_getGlobalBounds((*player)->sprites[index][x - 1]);
+    sfVector2f orrr = (sfVector2f){.x = or.left + or.width/2 , .y = or.top + or.height/2};
+    sfSprite_setOrigin((*player)->sprites[index][x - 1],orrr);
     sfSprite_setScale   ((*player)->sprites[index][x - 1],(*player)->scale);
+    sfSprite_setPosition((*player)->sprites[index][x - 1], (sfVector2f){125.f, 125.f});
     free(tempPath);
   }
 }
