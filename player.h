@@ -10,12 +10,18 @@ const int animations = 4;
 typedef struct Player {
   sfVector2f position;
   sfVector2f velocity;
+  sfVector2f previousPosition;
+  int playerAcceleration;
   sfVector2f scale;
   sfSprite ***sprites;
   sfVector2f size;
   int frames[4];
   int animationLoaded;
   float mass;
+  int inAir;
+  int index ;
+  int animFrames;
+  size_t frame;
 } Player;
 
 void spriteDestroy(Player *player);
@@ -89,7 +95,7 @@ void loadSprites(Player * player){
   char * dizzy = "./textures/dizzy/frame-";
   char * path = "./textures/run/frame-";
   char * jumpFall = "./textures/jump fall/frame-";
-  loadSprite(&player,idle,2,"idle");
+  loadSprite(&player,idle,4,"idle");
   loadSprite(&player,dizzy,2,"dizzy");
   loadSprite(&player,path,4,"run");
   loadSprite(&player,jumpFall,1,"jump");
@@ -99,7 +105,15 @@ Player* createPlayer(){
   Player *player = malloc(sizeof(Player));
   player->velocity = (sfVector2f){.x = 0,.y=0};
   player->position = (sfVector2f){.x = 150,.y=0};
-  player->mass = 155;
+  player->previousPosition = player->position;
+  player->mass = 45;
   player->animationLoaded = 1;
+  player->inAir = 1;
+  player->playerAcceleration = 3;
  return player;
+}
+
+void playeJump(Player * player){
+   player->mass = -175;
+   player->inAir = 1;
 }

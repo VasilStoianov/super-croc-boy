@@ -8,19 +8,28 @@
 
 int main() {
 
-  sfRectangleShape** rects = malloc(3 * sizeof(sfRectangleShape**));
-
-    for(int x = 0; x<4; x++){
-      sfRectangleShape *rect = sfRectangleShape_create();
-  sfRectangleShape_setSize(rect, (sfVector2f){300.f, 300.f});
-  sfRectangleShape_setPosition(rect, (sfVector2f){0.0f + 300.f * x, 724.0f});
-  sfRectangleShape_setFillColor(rect, sfRed);
-  rects[x] = malloc(sizeof(sfRectangleShape*));
- rects[x]  = rect;
-    }
+  sfRectangleShape **rects = malloc(4 * sizeof(sfRectangleShape **));
+   int rectNum[4];
+  for (int x = 0; x < 5; x++) {
   
+       sfRectangleShape *rect = sfRectangleShape_create();
+    sfRectangleShape_setSize(rect, (sfVector2f){300.f, 300.f});
+    if(x == 4){
 
- sfRenderStates state = sfRenderStates_default();
+    sfRectangleShape_setPosition(rect, (sfVector2f){0.0f + 300.f * 2, 275.f});
+    }else{
+
+    sfRectangleShape_setPosition(rect, (sfVector2f){0.0f + 300.f * x, 724.0f});
+    }
+
+   
+    sfRectangleShape_setFillColor(rect, sfRed);
+    rects[x] = malloc(sizeof(sfRectangleShape *));
+    rects[x] = rect;
+    rectNum[x] = x;
+  }
+
+  sfRenderStates state = sfRenderStates_default();
 
   sfEvent event;
   Player *player = createPlayer();
@@ -30,9 +39,9 @@ int main() {
   player->size.y *= 0.125f;
   size_t debug = 0;
 
-  int index = hash("jump") % animations;
-  int animFrames = player->frames[index];
-  size_t frame = 0;
+   player->index = hash("jump") % animations;
+  player->animFrames = player->frames[player->index];
+  player->frame = 0;
 
   sfClock *time = sfClock_create();
   sfTime startTime = sfClock_restart(time);
@@ -48,13 +57,16 @@ int main() {
 
   sfRenderWindow_setFramerateLimit(renderer, 60);
 
-sfRectangleShape *spriteBox = sfRectangleShape_create();
-sfRectangleShape_setFillColor(spriteBox,sfBlue);
-sfRectangleShape_setSize(spriteBox,player->size);
-sfRectangleShape_setOutlineColor(spriteBox,sfWhite);
-sfRectangleShape_setOutlineThickness(spriteBox,2.f);  
-sfFloatRect spriteBoxOrigin = sfRectangleShape_getGlobalBounds(spriteBox);
-sfRectangleShape_setOrigin(spriteBox,(sfVector2f){.x = spriteBoxOrigin.left + spriteBoxOrigin.width/2, .y = spriteBoxOrigin.top + spriteBoxOrigin.height/2});
+  sfRectangleShape *spriteBox = sfRectangleShape_create();
+  sfRectangleShape_setFillColor(spriteBox, sfBlue);
+  sfRectangleShape_setSize(spriteBox, player->size);
+  sfRectangleShape_setOutlineColor(spriteBox, sfWhite);
+  sfRectangleShape_setOutlineThickness(spriteBox, 2.f);
+  sfFloatRect spriteBoxOrigin = sfRectangleShape_getGlobalBounds(spriteBox);
+  sfRectangleShape_setOrigin(
+      spriteBox,
+      (sfVector2f){.x = spriteBoxOrigin.left + spriteBoxOrigin.width / 2,
+                   .y = spriteBoxOrigin.top + spriteBoxOrigin.height / 2});
   while (sfRenderWindow_isOpen(renderer)) {
     elapsedTime = sfClock_getElapsedTime(time);
     timeAsSeconds = sfTime_asMilliseconds(elapsedTime);
@@ -68,85 +80,75 @@ sfRectangleShape_setOrigin(spriteBox,(sfVector2f){.x = spriteBoxOrigin.left + sp
       if (event.key.code == sfKeyEscape) {
         sfRenderWindow_close(renderer);
       }
-      if(event.key.code  == sfKeyD && event.type == sfEvtKeyPressed){
-        debug = !debug;       
+      if (event.key.code == sfKeyD && event.type == sfEvtKeyPressed) {
+        debug = !debug;
       }
-      if(event.key.code == sfKeyRight && event.type == sfEvtKeyPressed){
-        player->velocity.x += 4.f * dt;
-        if(player->velocity.x > 50.f) player->velocity.x = 50.f;
-       player->scale.x = .125f;
-        index = hash("run") % animations;
-       animFrames = player->frames[index];
+      if (event.key.code == sfKeyRight && event.type == sfEvtKeyPressed) {
+      // if(sfKeyboard_isKeyPressed(sfKeyRight)){
+        player->velocity.x = (player->playerAcceleration);
+        player->scale.x = .125f;
+        player->index = hash("run") % animations;
+        player->animFrames = player->frames[player->index];
       }
-     if(event.key.code == sfKeyLeft && event.type == sfEvtKeyPressed){
-        player->velocity.x -= 4.f * dt;
+      if (event.key.code == sfKeyLeft && event.type == sfEvtKeyPressed) {
+      // if(sfKeyboard_isKeyPressed(sfKeyLeft)){
+        player->velocity.x = (-player->playerAcceleration);
 
-        if(player->velocity.x < -50.f) player->velocity.x = -50.f;
-        index = hash("run") % animations;
-       animFrames = player->frames[index];
-       player->scale.x = -.125f;
-                  
+        player->index = hash("run") % animations;
+        player->animFrames = player->frames[player->index];
+        player->scale.x = -.125f;
       }
- if(event.key.code == sfKeyRight && event.type == sfEvtKeyReleased){
-       
-  player->velocity.x = 0;
-   index = hash("idle") % animations;
-   frame = 0;
-       animFrames = player->frames[index]; 
-}
-     if(event.key.code == sfKeyLeft && event.type == sfEvtKeyReleased){
+      if ((event.key.code == sfKeyRight || event.key.code == sfKeyLeft) &&
+          event.type == sfEvtKeyReleased) {
         player->velocity.x = 0;
+        player->index = hash("idle") % animations;
+       player-> frame = 0;
+        player->animFrames = player->frames[player->index];
       }
-
+      if(sfKeyboard_isKeyPressed(sfKeyLShift) ){
+        player->velocity.x = player->velocity.x  * 2;
+      }
+      if(sfKeyboard_isKeyPressed(sfKeyUp)){
+        if(!player->inAir){
+          playeJump(player);
+        }
+      }
     }
-    
+
+     
+     player->position.x += player->velocity.x;
  
-    player->position.x += player->velocity.x;
-    for(int x = 0; x <4; x++){
-    sfRenderWindow_drawRectangleShape(renderer, rects[x], &state);
+  sfVector2i mPos =   sfMouse_getPositionRenderWindow(renderer);     
+  // player->position.x = mPos.x;
+  // player->position.y = mPos.y;
+    applyGravity(&player);
+    // player->position.y += player->velocity.y;
     
-  }
-    sfSprite * sprite = player->sprites[index][frame];
+    sfSprite *sprite = player->sprites[player->index][player->frame];
     sfSprite_setScale(sprite, player->scale);
-   
+    for (int x = 0; x < 5; x++) {
+      sfRenderWindow_drawRectangleShape(renderer, rects[x], &state);
+    handleCollision(player,sprite,rects[x]);
+    }
     sfSprite_setPosition(sprite, player->position);
      
-    applyGravity(&player);
-
-    sfMouse_setPositionRenderWindow((sfVector2i){.x = player->position.x + player->size.x /2 , .y = player->position.y + player->size.y/2},renderer);
- 
-    if(debug){
-
-    sfRenderWindow_drawRectangleShape(renderer,spriteBox,&state);
+    if (debug) {
+      sfRenderWindow_drawRectangleShape(renderer, spriteBox, &state);
     }
-    sfRenderWindow_drawSprite(renderer, player->sprites[index][frame], &state);
-     for(int x = 0; x <4; x++){
+    sfRenderWindow_drawSprite(renderer, player->sprites[player->index][player->frame], &state);
     
-      sfVector2f ox = aabb(sprite, rects[x]);
-    if(ox.x > 0 && ox.y > 0){
-      if(player->velocity.x == 0){
-       index = hash("idle") % animations;
-       frame = 0;
-       animFrames = player->frames[index];
-      }
-     player->velocity.y = 0;
-    //  ox.y += .220f;
-     player->position.y -= ox.y * dt ;
-     player->position.y -= .220f;
-    }
-  }
-    
-   
-sfRectangleShape_setPosition(spriteBox,player->position);
-    if (timeAsSeconds > 155) {
-      frame++;
-      if (frame >= animFrames-1)
-        frame = 0;
+
+    sfRectangleShape_setPosition(spriteBox, player->position);
+    if (timeAsSeconds > 750/player->animFrames) {
+      player->frame++;
+      if (player->frame >= player->animFrames)
+        player->frame = 0;
       sfClock_restart(time);
       timeAsSeconds = sfTime_asSeconds(elapsedTime);
     }
 
     sfRenderWindow_display(renderer);
+    player->previousPosition = player->position;
   }
 
   sfClock_destroy(time);
