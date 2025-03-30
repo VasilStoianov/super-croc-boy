@@ -9,20 +9,20 @@
 int main() {
 
   sfRectangleShape **rects = malloc(4 * sizeof(sfRectangleShape **));
-   int rectNum[4];
+  int rectNum[4];
   for (int x = 0; x < 5; x++) {
-  
-       sfRectangleShape *rect = sfRectangleShape_create();
+
+    sfRectangleShape *rect = sfRectangleShape_create();
     sfRectangleShape_setSize(rect, (sfVector2f){300.f, 300.f});
-    if(x == 4){
+    if (x == 4) {
 
-    sfRectangleShape_setPosition(rect, (sfVector2f){0.0f + 300.f * 2, 275.f});
-    }else{
+      sfRectangleShape_setPosition(rect, (sfVector2f){0.0f + 300.f * 2, 300.f});
+    } else {
 
-    sfRectangleShape_setPosition(rect, (sfVector2f){0.0f + 300.f * x, 724.0f});
+      sfRectangleShape_setPosition(rect,
+                                   (sfVector2f){0.0f + 300.f * x, 724.0f});
     }
 
-   
     sfRectangleShape_setFillColor(rect, sfRed);
     rects[x] = malloc(sizeof(sfRectangleShape *));
     rects[x] = rect;
@@ -39,7 +39,7 @@ int main() {
   player->size.y *= 0.125f;
   size_t debug = 0;
 
-   player->index = hash("jump") % animations;
+  player->index = hash("jump") % animations;
   player->animFrames = player->frames[player->index];
   player->frame = 0;
 
@@ -74,72 +74,33 @@ int main() {
     sfRenderWindow_clear(renderer, sfBlack);
 
     while (sfRenderWindow_pollEvent(renderer, &event)) {
-      if (event.key.type == sfEvtClosed) {
-        sfRenderWindow_close(renderer);
-      }
-      if (event.key.code == sfKeyEscape) {
-        sfRenderWindow_close(renderer);
-      }
-      if (event.key.code == sfKeyD && event.type == sfEvtKeyPressed) {
-        debug = !debug;
-      }
-      if (event.key.code == sfKeyRight && event.type == sfEvtKeyPressed) {
-      // if(sfKeyboard_isKeyPressed(sfKeyRight)){
-        player->velocity.x = (player->playerAcceleration);
-        player->scale.x = .125f;
-        player->index = hash("run") % animations;
-        player->animFrames = player->frames[player->index];
-      }
-      if (event.key.code == sfKeyLeft && event.type == sfEvtKeyPressed) {
-      // if(sfKeyboard_isKeyPressed(sfKeyLeft)){
-        player->velocity.x = (-player->playerAcceleration);
-
-        player->index = hash("run") % animations;
-        player->animFrames = player->frames[player->index];
-        player->scale.x = -.125f;
-      }
-      if ((event.key.code == sfKeyRight || event.key.code == sfKeyLeft) &&
-          event.type == sfEvtKeyReleased) {
-        player->velocity.x = 0;
-        player->index = hash("idle") % animations;
-       player-> frame = 0;
-        player->animFrames = player->frames[player->index];
-      }
-      if(sfKeyboard_isKeyPressed(sfKeyLShift) ){
-        player->velocity.x = player->velocity.x  * 2;
-      }
-      if(sfKeyboard_isKeyPressed(sfKeyUp)){
-        if(!player->inAir){
-          playeJump(player);
-        }
-      }
+      handleKeyInput(event,renderer,player);
     }
 
-     
-     player->position.x += player->velocity.x;
- 
-  sfVector2i mPos =   sfMouse_getPositionRenderWindow(renderer);     
-  // player->position.x = mPos.x;
-  // player->position.y = mPos.y;
-    applyGravity(&player);
-    // player->position.y += player->velocity.y;
-    
+    sfVector2i mPos = sfMouse_getPositionRenderWindow(renderer);
+    // player->position.x = mPos.x;
+    // player->position.y = mPos.y;
+
     sfSprite *sprite = player->sprites[player->index][player->frame];
     sfSprite_setScale(sprite, player->scale);
+
+    applyGravity(&player);
     for (int x = 0; x < 5; x++) {
       sfRenderWindow_drawRectangleShape(renderer, rects[x], &state);
-    handleCollision(player,sprite,rects[x]);
+      handleCollision(player, sprite, rects[x]);
     }
+
     sfSprite_setPosition(sprite, player->position);
-     
     if (debug) {
       sfRenderWindow_drawRectangleShape(renderer, spriteBox, &state);
     }
-    sfRenderWindow_drawSprite(renderer, player->sprites[player->index][player->frame], &state);
-    
+    sfRenderWindow_drawSprite(
+        renderer, player->sprites[player->index][player->frame], &state);
 
+    updatePlayer(player);
     sfRectangleShape_setPosition(spriteBox, player->position);
-    if (timeAsSeconds > 750/player->animFrames) {
+
+    if (timeAsSeconds > 750 / player->animFrames) {
       player->frame++;
       if (player->frame >= player->animFrames)
         player->frame = 0;

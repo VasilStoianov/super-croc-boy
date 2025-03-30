@@ -4,8 +4,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+extern float dt;
 
 const int animations = 4;
+
 
 typedef struct Player {
   sfVector2f position;
@@ -15,19 +17,24 @@ typedef struct Player {
   sfVector2f scale;
   sfSprite ***sprites;
   sfVector2f size;
+ sfBool up;
+ sfBool down;
+ sfBool left;
+ sfBool right;
   int frames[4];
   int animationLoaded;
   float mass;
   int inAir;
   int index ;
   int animFrames;
+  int maxYvelocity;
   size_t frame;
 } Player;
 
 void spriteDestroy(Player *player);
 void spriteDestroy(Player *player) {
 
-  for (int x = 0; x < 3; x++) {
+  for (int x = 0; x < 4;x++) {
     int frames = player->frames[x];
     for (int y = 0; y < frames; y++) {
       sfTexture_destroy(sfSprite_getTexture(player->sprites[x][y]));
@@ -106,14 +113,17 @@ Player* createPlayer(){
   player->velocity = (sfVector2f){.x = 0,.y=0};
   player->position = (sfVector2f){.x = 150,.y=0};
   player->previousPosition = player->position;
-  player->mass = 45;
+  player->mass = 25;
+  player->maxYvelocity = 10;
   player->animationLoaded = 1;
   player->inAir = 1;
   player->playerAcceleration = 3;
  return player;
 }
 
-void playeJump(Player * player){
-   player->mass = -175;
-   player->inAir = 1;
+void playerJump(Player * player){
+  printf("Jumping\n");
+  player->mass = -10;
+  // player->position.y += -15;
+  player->inAir = 1;
 }
